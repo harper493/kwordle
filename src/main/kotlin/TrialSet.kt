@@ -64,7 +64,7 @@ class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
         let {
             val goodLetters = LetterSet(matches)
             val words = vocab.filter { word ->
-                (goodLetters and LetterSet(word)).size >= 4
+                (goodLetters and word.chars).size >= 4
             }
             val subsets = LetterSet.all.map { it to mutableSetOf<Word>() }.toMap()
             words.forEach { subsets[it.text.first()]!!.add(it) }
@@ -93,9 +93,9 @@ class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
 
     fun letterTypes() =
         let {
-            var placed = LetterSet()
-            var unused = LetterSet()
-            var used = LetterSet()
+            val placed = LetterSet()
+            val unused = LetterSet()
+            val used = LetterSet()
             trials.map{ trial -> trial.map{
                 when (it.score) {
                     1 -> placed.insert(it.char)
