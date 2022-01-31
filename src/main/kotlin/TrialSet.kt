@@ -1,5 +1,5 @@
 class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
-    val trials = if (text.isNullOrEmpty()) mutableListOf<Trial>() else parse(text)
+    val trials = if (text.isNullOrEmpty()) mutableListOf() else parse(text)
     val size get() = trials.size
     var matches = vocab.words; private set
 
@@ -29,7 +29,7 @@ class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
                         val thisFind = next.find(vocab).toSet()
                         prev?.intersect(thisFind) ?: thisFind
                     }
-            } ?: setOf<Word>()
+            } ?: setOf()
             matches
         }
 
@@ -40,7 +40,7 @@ class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
             vocab.filter{ word ->
                 let {
                     val intersect = goodLetters and LetterSet(word)
-                    !(intersect.size < 4)
+                    intersect.size >= 4
                 }
             }.also{ println("considering ${it.size} words... ")}
                 .fold(Pair("", 0.0))
@@ -55,4 +55,28 @@ class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
                 }
             }.also{ println() }
         }
+
+    fun letterTypes() =
+        let {
+            var placed = LetterSet()
+            var unused = LetterSet()
+            var used = LetterSet()
+            trials.map{ trial -> trial.map{
+                when (it.score) {
+                    1 -> placed.insert(it.char)
+                    0 -> unused.insert(it.char)
+                    -1 -> used.insert(it.char)
+                    else -> {}
+                }
+            }
+            }
+            used.remove(placed)
+            LetterTypes(placed, used, unused,
+                LetterSet.all.remove(placed).remove(used).remove(unused))
+        }
+
+    data class LetterTypes(val placed: LetterSet,
+                           val used: LetterSet,
+                           val unused: LetterSet,
+                           val unknown: LetterSet)
 }

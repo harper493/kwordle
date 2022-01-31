@@ -16,7 +16,9 @@ class LetterSet(chars: Iterable<Char>?=null, value: Int=0) : Iterable<Char> {
     infix fun or(other: LetterSet) = LetterSet(value=(bits or other.bits))
     infix fun and(other: LetterSet) = LetterSet(value=(bits and other.bits))
     fun insert(ch: Char) = also{ bits = bits or toBit(ch) }
+    fun insert(ls: LetterSet) = also{ bits = bits or ls.bits }
     fun remove(ch: Char) = also{ bits = bits and toBit(ch).inv() }
+    fun remove(ls: LetterSet) = also{ bits = bits and ls.bits.inv()}
     fun inv() = LetterSet(value = bits.inv() and all.bits)
 
     constructor(ch: Char) : this(listOf(ch))
@@ -30,7 +32,7 @@ class LetterSet(chars: Iterable<Char>?=null, value: Int=0) : Iterable<Char> {
 
     companion object {
         const val alphabet = "abcdefghijklmnopqrstuvwxyz"
-        val all = LetterSet(alphabet)
+        val all get() = LetterSet(alphabet)
         private fun toBit(ch: Char) =
             1 shl (ch.lowercaseChar().code - 'a'.code)
         private fun fromBitNo(v: Int) = (v + 'a'.code).toChar()

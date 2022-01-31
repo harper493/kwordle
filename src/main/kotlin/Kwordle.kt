@@ -1,5 +1,5 @@
 class Kwordle(var vocab: Vocabulary) {
-    lateinit var commandList: CommandList
+    var commandList: CommandList
     lateinit var word: Word
     lateinit var trials: TrialSet
 
@@ -13,6 +13,7 @@ class Kwordle(var vocab: Vocabulary) {
         Command("exit", "exit kwordle", ::doNew),
         Command("help", "list commands", ::doHelp),
         Command("new", "start with a new random word", ::doNew),
+        Command("recap", "show ties so far and letter status", ::doRecap),
         Command("remaining", "show remaining words", ::doRemaining),
         Command("reveal", "show the current word (cheat!)", ::doReveal),
         Command("set", "set a known word", ::doSet),
@@ -37,10 +38,10 @@ class Kwordle(var vocab: Vocabulary) {
     }
 
     private fun noArgs(args: List<String>) {
-        if (args.size>0) CommandList.error("No arguments required for this command")
+        if (args.isNotEmpty()) CommandList.error("No arguments required for this command")
     }
     private fun oneArg(args: List<String>): String {
-        if (args.size==0) {
+        if (args.isEmpty()) {
             CommandList.error("Argument required for this command")
         } else if (args.size>1) {
             CommandList.error("Too many arguments)")
@@ -80,6 +81,21 @@ class Kwordle(var vocab: Vocabulary) {
         newWord()
     }
 
+    fun doRecap(args: List<String>) {
+        noArgs(args)
+        val types = trials.letterTypes()
+        println(trials.map{ it.toStyledText().render() }.joinToString("\n"))
+        println(StyledText(LetterSet.all.map{
+            val letter = it.toString()
+            when {
+                types.placed.contains(it) -> StyledText(letter.uppercase(), color="green")
+                types.used.contains(it) -> StyledText(letter.uppercase(), color="orange")
+                types.unused.contains(it) -> StyledText(letter, color="grey")
+                else -> StyledText(letter, color="black")
+            }
+        }).render())
+    }
+
     fun doBest(args: List<String>) {
         val best = trials.findBest()
         println("Best word to use is ${best.first} (entropy = ${best.second})")
@@ -88,7 +104,7 @@ class Kwordle(var vocab: Vocabulary) {
     fun doRemaining(args: List<String>) {
         noArgs(args)
         if (trials.size>0) {
-            val wordList = trials.matches.take(20).map { it.text }.joinToString(", ")
+            val wordList = trials.matches.take(20).joinToString(", ") { it.text }
             val ellipsis = if (trials.matches.size > 20) ", ..." else ""
             println("${trials.matches.size} ${"word".makePlural(trials.matches.size)} still possible: $wordList$ellipsis")
         } else {
