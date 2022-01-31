@@ -10,7 +10,7 @@ class Vocabulary(val length: Int) : Iterable<Word> {
         also {
             words = wordList.filter{it.length==length || length==0}
                 .map{Word(it)}
-                .also{ it.forEach{ addToIndex(it) } }
+                .onEach { addToIndex(it) }
                 .toSet()
             justWords = words.map{ it.text }.toSet()
         }
@@ -51,7 +51,7 @@ class Vocabulary(val length: Int) : Iterable<Word> {
         word.text.toSet().forEach{ addOneIndex(-1, it, word) }
     }
     private fun addOneIndex(i: Int, ch: Char, word: Word) {
-        index.merge(ch to i, mutableSetOf(word),
-            { old, new -> old.also{ old.addAll(new) }})
+        index.merge(ch to i, mutableSetOf(word)
+        ) { old, new -> old.also { old.addAll(new) } }
     }
 }

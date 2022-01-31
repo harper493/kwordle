@@ -1,5 +1,5 @@
 class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.IteratorValue> {
-    data class IteratorValue(val index: Int, val char: Char, val score: Int) {}
+    data class IteratorValue(val index: Int, val char: Char, val score: Int)
     class TrialIterator(val trial: Trial) : Iterator<IteratorValue> {
         private var index = 0
         override fun hasNext() = index < trial.size
@@ -12,7 +12,7 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
         override fun iterator() = PossibleIterator(trial)
     }
     class PossibleIterator(val trial: Trial) : Iterator<Trial> {
-        val cp = CartesianProduct(listOf(-1, 0, 1), trial.word.length).iterator()
+        private val cp = CartesianProduct(listOf(-1, 0, 1), trial.word.length).iterator()
         override fun hasNext() = cp.hasNext()
         override fun next() =
             let {
@@ -73,7 +73,7 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
                         when {
                             s > 0 && w != t -> false
                             s == 0 && w in letters -> false
-                            s < 0 && !(w in letters) -> false
+                            s < 0 && w !in letters -> false
                             s < 0 && w == t -> false
                             else -> true
                         }

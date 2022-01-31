@@ -90,7 +90,7 @@ class Kwordle(var vocab: Vocabulary) {
         if (trials.size>0) {
             val wordList = trials.matches.take(20).map { it.text }.joinToString(", ")
             val ellipsis = if (trials.matches.size > 20) ", ..." else ""
-            println("${trials.matches.size} words still possible: $wordList$ellipsis")
+            println("${trials.matches.size} ${"word".makePlural(trials.matches.size)} still possible: $wordList$ellipsis")
         } else {
             println("All ${vocab.size} words still possible")
         }

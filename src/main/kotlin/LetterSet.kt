@@ -1,6 +1,6 @@
 
 class LetterSet(chars: Iterable<Char>?=null, value: Int=0) : Iterable<Char> {
-    private val bits = chars?.fold(0){ prev, ch ->prev or (1 shl (toBit(ch))) } ?: value
+    private var bits = chars?.fold(0){ prev, ch ->prev or toBit(ch) } ?: value
 
     override fun iterator() =
         toString().iterator()
@@ -15,6 +15,9 @@ class LetterSet(chars: Iterable<Char>?=null, value: Int=0) : Iterable<Char> {
     val size: Int = if (empty()) 0 else 1 + LetterSet(value=(bits and (bits-1))).size
     infix fun or(other: LetterSet) = LetterSet(value=(bits or other.bits))
     infix fun and(other: LetterSet) = LetterSet(value=(bits and other.bits))
+    fun insert(ch: Char) = also{ bits = bits or toBit(ch) }
+    fun remove(ch: Char) = also{ bits = bits and toBit(ch).inv() }
+    fun inv() = LetterSet(value = bits.inv() and all.bits)
 
     constructor(ch: Char) : this(listOf(ch))
     constructor(text: String) : this(text.toList())
@@ -26,13 +29,13 @@ class LetterSet(chars: Iterable<Char>?=null, value: Int=0) : Iterable<Char> {
             }.bits)
 
     companion object {
-        private fun toBit(ch: Char) = let {
-            val b = ch.lowercaseChar().code - 'a'.code
-            b
-        }
-        private fun fromBit(v: Int) = (v + 'a'.code).toChar()
+        const val alphabet = "abcdefghijklmnopqrstuvwxyz"
+        val all = LetterSet(alphabet)
+        private fun toBit(ch: Char) =
+            1 shl (ch.lowercaseChar().code - 'a'.code)
+        private fun fromBitNo(v: Int) = (v + 'a'.code).toChar()
         private fun toStringOne(bits: Int, offset: Int): String =
-            (if ((bits and 1)==1) fromBit(offset).toString() else "") +
+            (if ((bits and 1)==1) fromBitNo(offset).toString() else "") +
                     (if (bits==0) "" else toStringOne(bits shr 1, offset+1))
     }
 }
