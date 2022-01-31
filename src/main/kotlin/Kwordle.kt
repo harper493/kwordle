@@ -34,6 +34,7 @@ class Kwordle(var vocab: Vocabulary) {
         if (chosen!=null) {
             (chosen as Command).fn(args)
         }
+        print(StyledText())
         return true
     }
 
@@ -60,20 +61,14 @@ class Kwordle(var vocab: Vocabulary) {
         trials.append(t)
         if (t.matched()) {
             if (trials.size==1) {
-                print(StyledText("You got lucky! The word is '$word'", color="deep_blue").render())
+                output("You got lucky! The word is '$word'")
             } else {
-                print(
-                    StyledText(
-                        "Success! The word is '${word}', found in ${trials.size} attempts",
-                        color = "deep_blue"
-                    ).render()
-                )
+                output("Success! The word is '${word}', found in ${trials.size} attempts")
             }
             newWord()
         } else {
-            print(t.toStyledText().render())
+            println(t.toStyledText())
         }
-        println(StyledText().render())
     }
 
     fun doNew(args: List<String>) {
@@ -93,12 +88,12 @@ class Kwordle(var vocab: Vocabulary) {
                 types.unused.contains(it) -> StyledText(letter, color="grey")
                 else -> StyledText(letter, color="black")
             }
-        }).render())
+        }))
     }
 
     fun doBest(args: List<String>) {
         val best = trials.findBest()
-        println("Best word to use is ${best.first} (entropy = ${best.second})")
+        output("Best word to use is '${best.first}' (entropy = ${"%.4f".format(best.second)})")
     }
 
     fun doRemaining(args: List<String>) {
@@ -106,9 +101,9 @@ class Kwordle(var vocab: Vocabulary) {
         if (trials.size>0) {
             val wordList = trials.matches.take(20).joinToString(", ") { it.text }
             val ellipsis = if (trials.matches.size > 20) ", ..." else ""
-            println("${trials.matches.size} ${"word".makePlural(trials.matches.size)} still possible: $wordList$ellipsis")
+            output("${trials.matches.size} ${"word".makePlural(trials.matches.size)} still possible: $wordList$ellipsis")
         } else {
-            println("All ${vocab.size} words still possible")
+            output("All ${vocab.size} words still possible")
         }
     }
 
@@ -120,7 +115,7 @@ class Kwordle(var vocab: Vocabulary) {
     fun doEntropy(args: List<String>) {
         val w = vocab.valid(oneArg(args))
         val p = Partition(vocab, w, trials.matches)
-        println("Entropy for '$w' is ${p.entropy}")
+        output("Entropy for '$w' is ${"%.4f".format(p.entropy)}")
     }
 
     fun doSet(args: List<String>) {
@@ -138,6 +133,10 @@ class Kwordle(var vocab: Vocabulary) {
     fun doHelp(args: List<String>) {
         noArgs(args)
         println(commandList.help().joinToString("\n"))
+    }
+
+    fun output(text: String) {
+        println(StyledText(text, color="deep_blue"))
     }
 
 }

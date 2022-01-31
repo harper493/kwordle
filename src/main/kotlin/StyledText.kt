@@ -126,6 +126,8 @@ class StyledText (
 
     fun renderStyled() = this
 
+    override fun toString() = render()
+
     companion object {
         private val colors = mapOf(
             "black" to 232,

@@ -1,3 +1,7 @@
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.GlobalScope
+
 class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
     val trials = if (text.isNullOrEmpty()) mutableListOf() else parse(text)
     val size get() = trials.size
@@ -33,7 +37,7 @@ class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
             matches
         }
 
-    fun findBest() =
+    fun findBestSlow() =
         let {
             val goodLetters = LetterSet(match())
             var initial = "!"
@@ -55,6 +59,37 @@ class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
                 }
             }.also{ println() }
         }
+
+    fun findBest() =
+        let {
+            val goodLetters = LetterSet(matches)
+            val words = vocab.filter { word ->
+                (goodLetters and LetterSet(word)).size >= 4
+            }
+            val subsets = LetterSet.all.map { it to mutableSetOf<Word>() }.toMap()
+            words.forEach { subsets[it.text.first()]!!.add(it) }
+            val results = subsets.map{ GlobalScope.async{ findBestSome(it.value, it.key.toString()) } }
+            var result = Pair("", 0.0)
+            runBlocking {
+                result = results.fold(Pair("", 0.0))
+                { prev, def ->
+                    let {
+                        val r = def.await()
+                        if (prev.second < r.second) r else prev
+                    }
+                }
+            }
+            result
+        }
+
+    fun findBestSome(words: Iterable<Word>, tag: String) =
+        words.fold(Pair("", 0.0))
+        { prev, word ->
+            let {
+                val e = Partition(vocab, word.text, matches).entropy
+                if (prev.second < e) Pair(word.text, e) else prev
+            }
+        }.also{ if (false && tag.isNotEmpty()) println("completed $tag") }
 
     fun letterTypes() =
         let {
