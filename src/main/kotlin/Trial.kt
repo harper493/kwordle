@@ -65,7 +65,7 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
 
     fun match(target: String) =
         let {
-            val letters = target.toSet()
+            val letters = LetterSet(zip(target.toList(), scores).filter{ it.second != 1}.map{it.first})
             zip(word.toList(), target.toList(), scores)
                 .fold(true){ prev, v ->
                     prev && let {
