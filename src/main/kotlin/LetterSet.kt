@@ -1,3 +1,10 @@
+/**
+ * LetterSet class - represents a Set<Char> where the caracters are restricted
+ * to the range a-z (or interchangeably A-Z).
+ *
+ * Implements all the usual operators on sets. Can be contrcuted from a
+ * string, character, or a list of stings, and also the Word class from here.
+ */
 
 class LetterSet(chars: Iterable<Char>?=null, value: Int=0) : Iterable<Char> {
     private var bits = chars?.fold(0){ prev, ch ->prev or toBit(ch) } ?: value

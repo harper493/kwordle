@@ -66,9 +66,8 @@ class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
             val words = vocab.filter { word ->
                 (goodLetters and word.chars).size >= 4
             }
-            val subsets = LetterSet.all.map { it to mutableSetOf<Word>() }.toMap()
-            words.forEach { subsets[it.text.first()]!!.add(it) }
-            val results = subsets.map{ GlobalScope.async{ findBestSome(it.value, it.key.toString()) } }
+            val subsets = words.chunked(words.size / 20)
+            val results = subsets.map{ GlobalScope.async{ findBestSome(it, it.first().text) } }
             var result = Pair("", 0.0)
             runBlocking {
                 result = results.fold(Pair("", 0.0))
@@ -89,7 +88,7 @@ class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
                 val e = Partition(vocab, word.text, matches).entropy
                 if (prev.second < e) Pair(word.text, e) else prev
             }
-        }.also{ if (false && tag.isNotEmpty()) println("completed $tag") }
+        }.also{ if (tag.isNotEmpty()) println("completed $tag") }
 
     fun letterTypes() =
         let {

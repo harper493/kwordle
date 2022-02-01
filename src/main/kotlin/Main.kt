@@ -11,8 +11,8 @@ fun main(args: Array<String>) {
                 break
             }
         } catch(e: CommandError) {
-            print(StyledText(e.message ?: "", color = "red").render())
-            println(StyledText().render())
+            print(StyledText(e.message ?: "", color = "red"))
+            println(StyledText())
         }
     }
 }
