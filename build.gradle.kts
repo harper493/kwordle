@@ -15,6 +15,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2")
+    implementation("com.xenomachina:kotlin-argparser:2.0.7")
 }
 
 tasks.test {
