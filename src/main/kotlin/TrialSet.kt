@@ -100,7 +100,7 @@ class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
                 val e = Partition(vocab, word.text, matches).entropy
                 if (prev.second < e) Pair(word.text, e) else prev
             }
-        }.also{ if (tag.isNotEmpty()) println("completed $tag") }
+        }.also{ if (false && tag.isNotEmpty()) println("completed $tag") }
 
     /*
      * findBestSlow - single thread version of findBest

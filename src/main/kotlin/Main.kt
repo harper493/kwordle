@@ -1,9 +1,15 @@
 
 
-fun main(args: Array<String>) {
-    val vocab = Vocabulary(5)
-    vocab.load(defaultVocabulary.split('\n'))
+fun main(cmdArgs: Array<String>) {
+    val args = Args.parse(cmdArgs)
+    val vocab = Vocabulary(args.length)
+    if (args.dictionary.isEmpty()) {
+        vocab.load(defaultVocabulary.split('\n'))
+    } else {
+        vocab.loadFile(args.dictionary)
+    }
     val kwordle = Kwordle(vocab)
+    StyledText.setRenderer(if (args.color) "ISO6429" else "None")
     while (true) {
         print("kwordle> ")
         try {

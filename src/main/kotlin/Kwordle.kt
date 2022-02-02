@@ -1,3 +1,5 @@
+import java.util.Timer
+
 class Kwordle(var vocab: Vocabulary) {
     var commandList: CommandList
     lateinit var word: Word
@@ -92,8 +94,12 @@ class Kwordle(var vocab: Vocabulary) {
     }
 
     fun doBest(args: List<String>) {
-        val best = trials.findBest()
-        output("Best word to use is '${best.first}' (entropy = ${"%.4f".format(best.second)})")
+        var best = "" to 0.0
+        print("Finding best word ")
+        ProgressMarker().use {
+            best = trials.findBest()
+        }
+        output("\nBest word to use is '${best.first}' (entropy = ${"%.4f".format(best.second)})")
     }
 
     fun doRemaining(args: List<String>) {

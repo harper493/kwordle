@@ -25,19 +25,19 @@ class Partition(val vocab: Vocabulary, val key: String, val words: Set<Word>) {
     fun evaluateEntropy() =
         let {
             var totalSize: Double
-            -(CartesianProduct(listOf(-1, 0, 1), key.length)
+            CartesianProduct(listOf(-1, 0, 1), key.length)
                 .map {
                     Trial(key, it)
                         .find(vocab)
                         .intersect(words)
                         .size
+                        .toDouble()
                 }
                 .filter { it > 0.0 }
-                .also { totalSize = it.sum().toDouble() }
-                .map { it * ln(it.toDouble() / totalSize) }
-                .sum()
-                    / (totalSize * ln(totalSize)))
+                .also { totalSize = it.sum() }
+                .map { it * -ln(it / totalSize) }
+                .sum() /
+            (totalSize * ln(totalSize))
         }
-
 }
 
