@@ -1,7 +1,13 @@
-
+import kotlin.system.exitProcess
 
 fun main(cmdArgs: Array<String>) {
-    val args = Args.parse(cmdArgs)
+    lateinit var args: Args
+    try {
+        args = Args.parse(cmdArgs)
+    } catch (e: Exception) {
+        println(e.message)
+        exitProcess(1)
+    }
     val vocab = Vocabulary(args.length)
     if (args.dictionary.isEmpty()) {
         vocab.load(defaultVocabulary.split('\n'))
