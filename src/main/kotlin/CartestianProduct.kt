@@ -1,5 +1,13 @@
-
-
+/**
+ * CartesianProduct class - return cartesian product of vectors via an iterator.
+ *
+ * Given a list of lists (or any iterable), return the cartesian product of
+ * their contents.
+ *
+ * Alternative constructor allows the same list to be repeated.
+ *
+ * The types of the elements of the lists must all be the same.
+ */
 
 class CartesianProduct<T>(val valueList: Iterable<Iterable<T>>) : Iterable<List<T>> {
 

@@ -8,17 +8,8 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
                 .also { ++index }
     }
 
-    class Possibles(val trial: Trial) : Iterable<Trial> {
-        override fun iterator() = PossibleIterator(trial)
-    }
-    class PossibleIterator(val trial: Trial) : Iterator<Trial> {
-        private val cp = CartesianProduct(listOf(-1, 0, 1), trial.word.length).iterator()
-        override fun hasNext() = cp.hasNext()
-        override fun next() =
-            let {
-                trial.scores = cp.next()
-                trial
-            }
+    constructor(word: String, givenScores: Iterable<Int>) : this(givenWord=word) {
+        scores = givenScores.toList()
     }
 
     val word: String = givenWord ?: parse(text ?: "")
@@ -79,18 +70,17 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
                         }
                     }
                 }
-        }.also{ it }
+        }
 
     override fun toString() =
-        word.toList().zip(scores)
-            .map {
-                when {
-                    it.second > 0 -> "+${it.first.uppercase()}"
-                    it.second == 0 -> it.first.lowercase()
-                    it.second < 0 -> it.first.uppercase()
-                    else -> ""
-                }
-            }.joinToString("")
+        word.toList().zip(scores).joinToString("") {
+            when {
+                it.second > 0 -> "+${it.first.uppercase()}"
+                it.second == 0 -> it.first.lowercase()
+                it.second < 0 -> it.first.uppercase()
+                else -> ""
+            }
+        }
 
     fun toStyledText() =
         StyledText(word.toList().zip(scores)
@@ -105,8 +95,6 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
 
     fun find(vocab: Vocabulary) =
         vocab.findBest(this).filter { match(it.text) }.toSet()
-
-    fun possibles() = Possibles(this)
 
     fun matched() = scores.sum()==scores.size
 
