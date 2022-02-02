@@ -8,7 +8,7 @@ fun main(cmdArgs: Array<String>) {
     } else {
         vocab.loadFile(args.dictionary)
     }
-    val kwordle = Kwordle(vocab)
+    val kwordle = Kwordle(vocab, args)
     StyledText.setRenderer(if (args.color) "ISO6429" else "None")
     while (true) {
         print("kwordle> ")

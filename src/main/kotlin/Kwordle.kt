@@ -1,6 +1,4 @@
-import java.util.Timer
-
-class Kwordle(var vocab: Vocabulary) {
+class Kwordle(var vocab: Vocabulary, val cmdArgs: Args) {
     var commandList: CommandList
     lateinit var word: Word
     lateinit var trials: TrialSet
@@ -81,7 +79,7 @@ class Kwordle(var vocab: Vocabulary) {
     fun doRecap(args: List<String>) {
         noArgs(args)
         val types = trials.letterTypes()
-        println(trials.map{ it.toStyledText().render() }.joinToString("\n"))
+        println(trials.joinToString("\n") { it.toStyledText().render() })
         println(StyledText(LetterSet.all.map{
             val letter = it.toString()
             when {
@@ -94,10 +92,14 @@ class Kwordle(var vocab: Vocabulary) {
     }
 
     fun doBest(args: List<String>) {
-        var best = "" to 0.0
-        print("Finding best word ")
-        ProgressMarker().use {
-            best = trials.findBest()
+        var best: Pair<String, Double>
+        if (cmdArgs.verbose) {
+            best = trials.findBest(true)
+        } else {
+            print("Finding best word ")
+            ProgressMarker().use {
+                best = trials.findBest(false)
+            }
         }
         output("\nBest word to use is '${best.first}' (entropy = ${"%.4f".format(best.second)})")
     }

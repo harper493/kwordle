@@ -72,7 +72,7 @@ class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
      * partitions for the given subset of the vocabulary.
      */
 
-    fun findBest() =
+    fun findBest(verbose: Boolean=false) =
         let {
             val goodLetters = LetterSet(matches)
             val words = vocab.filter { word ->
@@ -81,8 +81,8 @@ class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
             runBlocking {
                 vocab
                     .filter { (goodLetters and it.chars).size >= 4 }
-                    .chunked(words.size / 20)
-                    .map{ GlobalScope.async{ findBestSome(it, it.first().text) } }
+                    .chunked(maxOf(words.size / 20, 20))
+                    .map{ GlobalScope.async{ findBestSome(it, if (verbose) it.first().text else null) } }
                     .fold(Pair("", 0.0))
                     { prev, def ->
                         let {
@@ -93,14 +93,14 @@ class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
             }
         }
 
-    fun findBestSome(words: Iterable<Word>, tag: String) =
+    fun findBestSome(words: Iterable<Word>, tag: String?) =
         words.fold(Pair("", 0.0))
         { prev, word ->
             let {
                 val e = Partition(vocab, word.text, matches).entropy
                 if (prev.second < e) Pair(word.text, e) else prev
             }
-        }.also{ if (false && tag.isNotEmpty()) println("completed $tag") }
+        }.also{ tag?.let{ println("completed $tag") }}
 
     /*
      * findBestSlow - single thread version of findBest
