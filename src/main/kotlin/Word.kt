@@ -5,6 +5,7 @@
 
 class Word(val text: String) {
     val chars = LetterSet(text)
+    val length get() = text.length
 
     override fun toString() = text
 }

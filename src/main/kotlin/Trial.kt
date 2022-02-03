@@ -123,7 +123,7 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
 
     /*
      * toStyledText - return a StyledText object representing the word with the
-     * letters colred according to their score
+     * letters colored according to their score
      */
 
     fun toStyledText() =
