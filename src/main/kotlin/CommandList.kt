@@ -7,6 +7,9 @@ class CommandList(val commands: List<Command>) {
 
         lateinit var prefix: String; private set
 
+        fun formatHelp() =
+            ("%-15s %s").format(command, help)
+
         fun setPrefix(commands: Iterable<Command>) {
             prefix = commands.filter{ it!=this }.fold(""){
                     prev, cmd -> let {
@@ -25,10 +28,7 @@ class CommandList(val commands: List<Command>) {
         val args = line.split("#")[0].split("\\s+".toRegex())
         val cmd = args[0]
         val chosen = if (cmd.isNotEmpty()) {
-            val matches = commands
-                .filter{ cmd.startsWith(it.prefix) and
-                        it.command.startsWith(cmd) and
-                        (cmd.length <= it.command.length) }
+            val matches = findCommands(cmd)
             when {
                 matches.size==0 -> { error("Invalid command"); null }
                 matches.size>1 -> { error("Ambiguous command"); null }
@@ -39,7 +39,18 @@ class CommandList(val commands: List<Command>) {
     }
 
     fun help() =
-        commands.map{("%-15s %s").format(it.command, it.help)}
+        commands.map{ it.formatHelp() }
+
+    fun getHelp(subject: String) =
+        findCommands(subject)
+            .map{ it.formatHelp() }
+            .let{ if (it.isEmpty()) listOf("No help available for $subject") else it }
+
+    private fun findCommands(cmd: String) =
+        commands
+            .filter{ cmd.startsWith(it.prefix) and
+                    it.command.startsWith(cmd) and
+                    (cmd.length <= it.command.length) }
 
     companion object {
         fun error(msg: String) {

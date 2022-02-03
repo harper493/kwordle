@@ -1,5 +1,33 @@
 /**
+ * StyledText class. Repesents text with associated styling (color and
+ * other style, e.g. italic, bold).
  *
+ * A single styled text segment is created using
+ * StyledText(text, [color=named color],
+ *                  [style=named style],
+ *                  [background=named color])
+ *
+ * Different styles can be applied to different text segments by creating a StyledText
+ * from a list of individual segments, e.g.:
+ *
+ * StyledText(StyledText("Hello", color="red", style="italic"),
+ *            StyledText(" world", color="green", style="bold"))
+ *
+ * Styles can be applied to a container, in which case they apply to the elements
+ * * within the container if nothing else is specified.
+ *
+ * A StyledText object can be turned into text using the render() function.
+ * This is automatically invoked where a String is required.
+ *
+ * The render mode can be set using the companion object function
+ * Current possible values are:
+ *
+ * "ISO6429" - VT100 style escape sequences
+ * "Plain" - don't apply markup
+ *
+ * Valid colors and styles are at the end of this file.
+ *
+ * See code below for other functions.
  */
 
 class StyledText (
@@ -28,6 +56,10 @@ class StyledText (
 
     fun render() = renderer(this)
 
+    /*
+     * append - append another StyledText object
+     */
+
     fun append(st: StyledText): StyledText =
         also {
             when {
@@ -42,6 +74,10 @@ class StyledText (
                 }
             }
         }
+
+    /*
+     * append - apend a single piece of text
+     */
 
     fun append(text: String = "",
                color: String? = null,

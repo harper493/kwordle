@@ -1,3 +1,8 @@
+/**
+ * ProgressMarker class - output a string at a regular interval (expressed in seconds)
+ * until close() is called. Intended to be used with the use() function.
+ */
+
 import java.io.Closeable
 import kotlin.concurrent.*
 

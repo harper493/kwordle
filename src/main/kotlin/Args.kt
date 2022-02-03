@@ -1,8 +1,6 @@
 
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
-import kotlin.properties.Delegates
-import kotlin.system.exitProcess
 
 class Args() {
     lateinit var command: String; private set
@@ -24,9 +22,7 @@ class Args() {
             try {
                 length = lengthStr.toInt()
             } catch(e: Exception) {
-                println("length must be a number")
-                exitProcess(1)
-            }
+                throw(Exception("length must be a number"))            }
             color = !noColor
         }
 

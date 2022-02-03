@@ -1,3 +1,24 @@
+/**
+ * Trial class - represents one attempt at guessing a word. Contains the word,
+ * and the score for each letter represented as:
+ *
+ *  1 - this position matches
+ *  0 - this letter matches nowhere
+ * -1 - this letter matches but not at this position
+ *
+ * It can be constructed from just a word, and completed by calling compare(), or
+ * from a string representing a match in the form:
+ *
+ * aB+Cde where:
+ *
+ * - a lower case letter means a complete miss - letter not present
+ * - + means an exact match for the following letter
+ * - an upper case letter means a match but not here
+ *
+ * Iterating over a Trial object returns a 3-tuple (actually a
+ * Trial.IteratorValue) with the position, the letter and its score.
+ */
+
 class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.IteratorValue> {
     data class IteratorValue(val index: Int, val char: Char, val score: Int)
     class TrialIterator(val trial: Trial) : Iterator<IteratorValue> {
@@ -18,6 +39,10 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
 
     override fun iterator() = TrialIterator(this)
 
+    /*
+     * compare - fill in the scores comparing the Trial's word with the given word
+     */
+
     fun compare(target: String) =
         also {
             val remaining = mutableSetOf<Char>()
@@ -33,6 +58,11 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
                 if (it.first == 0 && remaining.contains(it.second)) -1 else it.first
             }
         }
+
+    /*
+     * parse - parse a sting representation of the word and its score, in the
+     * format described in the header comment
+     */
 
     fun parse(text: String): String =
         let {
@@ -53,6 +83,11 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
             }
         }.joinToString("")
 
+    /*
+     * match - return true iff this Trial matches the given word, taking into
+     * account the scores. It's made complicated by the fact that a letter is
+     * a non-match even if the same letter is present elsewhere and matches.
+     */
 
     fun match(target: String) =
         let {
@@ -72,6 +107,10 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
                 }
         }
 
+    /*
+     * toString - generate the sting representation of the word and its score
+     */
+
     override fun toString() =
         word.toList().zip(scores).joinToString("") {
             when {
@@ -81,6 +120,11 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
                 else -> ""
             }
         }
+
+    /*
+     * toStyledText - return a StyledText object representing the word with the
+     * letters colred according to their score
+     */
 
     fun toStyledText() =
         StyledText(word.toList().zip(scores)
@@ -93,10 +137,22 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
                 }
             })
 
+    /*
+     * find - find the selection of words from the vocabulary that match this Trial
+     */
+
     fun find(vocab: Vocabulary) =
         vocab.findBest(this).filter { match(it.text) }.toSet()
 
-    fun matched() = scores.sum()==scores.size
+    /*
+     * isMatched - return true iff this trial has a perfect match on every letter
+     */
+
+    fun isMatched() = scores.sum()==scores.size
+
+    /*
+     * hash - return a hash value for the scores for this word
+     */
 
     fun hash() =
         scores.fold(0){ prev, s -> (prev shl 2) + (s+1) }

@@ -8,13 +8,13 @@ class Kwordle(var vocab: Vocabulary, val cmdArgs: Args) {
                   val fn: (List<String>)->Unit) : CommandList.Command(command, help)
 
     val commands = listOf(
-        Command("best", "find best word to try", ::doBest),
+        Command("best", "find best word to try (slow)", ::doBest),
         Command("entropy", "show entropy for a word in the current context", ::doEntropy),
         Command("exit", "exit kwordle", ::doNew),
         Command("help", "list commands", ::doHelp),
         Command("new", "start with a new random word", ::doNew),
-        Command("recap", "show ties so far and letter status", ::doRecap),
-        Command("remaining", "show remaining words", ::doRemaining),
+        Command("recap", "show tries so far and letter status", ::doRecap),
+        Command("remaining", "show remaining words (cheat!)", ::doRemaining),
         Command("reveal", "show the current word (cheat!)", ::doReveal),
         Command("set", "set a known word", ::doSet),
         Command("try", "try a word against the current word", ::doTry),
@@ -41,6 +41,7 @@ class Kwordle(var vocab: Vocabulary, val cmdArgs: Args) {
     private fun noArgs(args: List<String>) {
         if (args.isNotEmpty()) CommandList.error("No arguments required for this command")
     }
+
     private fun oneArg(args: List<String>): String {
         if (args.isEmpty()) {
             CommandList.error("Argument required for this command")
@@ -55,11 +56,10 @@ class Kwordle(var vocab: Vocabulary, val cmdArgs: Args) {
         trials = TrialSet(vocab)
     }
 
-
     fun doTry(args: List<String>) {
         val t = Trial(vocab.valid(oneArg(args), mustBeWord = true)).compare(word.text)
         trials.append(t)
-        if (t.matched()) {
+        if (t.isMatched()) {
             if (trials.size==1) {
                 output("You got lucky! The word is '$word'")
             } else {
@@ -139,8 +139,11 @@ class Kwordle(var vocab: Vocabulary, val cmdArgs: Args) {
     }
 
     fun doHelp(args: List<String>) {
-        noArgs(args)
-        println(commandList.help().joinToString("\n"))
+        if (args.isEmpty()) {
+            println(commandList.help().joinToString("\n"))
+        } else {
+            println(commandList.getHelp(oneArg(args)).joinToString("\n"))
+        }
     }
 
     fun output(text: String) {

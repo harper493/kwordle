@@ -5,7 +5,7 @@ fun main(cmdArgs: Array<String>) {
     try {
         args = Args.parse(cmdArgs)
     } catch (e: Exception) {
-        println(e.message)
+        println("Error on command line: ${e.message}")
         exitProcess(1)
     }
     val vocab = Vocabulary(args.length)

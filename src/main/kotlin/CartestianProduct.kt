@@ -2,7 +2,8 @@
  * CartesianProduct class - return cartesian product of vectors via an iterator.
  *
  * Given a list of lists (or any iterable), return the cartesian product of
- * their contents.
+ * their contents in the form of an iterator that successively returns
+ * the elements of the product.
  *
  * Alternative constructor allows the same list to be repeated.
  *
