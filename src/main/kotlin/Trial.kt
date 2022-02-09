@@ -95,20 +95,20 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
             zip(word.toList(), target.toList(), scores)
                 .fold(true){ prev, v ->
                     prev && let {
-                        val (w, t, s) = v
+                        val (w, t, s) = v   // w=letter from our own word, t=letter from target, s=score
                         when {
-                            s > 0 && w != t -> false
+                            s > 0 && w != t        -> false
                             s == 0 && w in letters -> false
                             s < 0 && w !in letters -> false
-                            s < 0 && w == t -> false
-                            else -> true
+                            s <= 0 && w == t       -> false
+                            else                   -> true
                         }
                     }
                 }
         }
 
     /*
-     * toString - generate the sting representation of the word and its score
+     * toString - generate the string representation of the word and its score
      */
 
     override fun toString() =
@@ -130,10 +130,10 @@ class Trial (givenWord: String?=null, text: String?=null) : Iterable<Trial.Itera
         StyledText(word.toList().zip(scores)
             .map {
                 when {
-                    it.second > 0 -> StyledText(it.first.uppercase(), color="green")
+                    it.second > 0  -> StyledText(it.first.uppercase(), color="green")
                     it.second == 0 -> StyledText(it.first.lowercase(), color="grey")
-                    it.second < 0 -> StyledText(it.first.uppercase(), color="orange")
-                    else -> StyledText()
+                    it.second < 0  -> StyledText(it.first.uppercase(), color="orange")
+                    else           -> StyledText()  // can't happen
                 }
             })
 

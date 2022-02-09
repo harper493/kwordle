@@ -17,10 +17,10 @@
 
 class Vocabulary(val length: Int) : Iterable<Word> {
 
-    lateinit var words: Set<Word>; private set
-    lateinit var justWords: Set<String>; private set
+    lateinit var words: MutableSet<Word>; private set
+    lateinit var justWords: MutableSet<String>; private set
     var maxLength = 0; private set
-    var index = mutableMapOf<Pair<Char, Int>, Set<Word>>(); private set
+    var index = mutableMapOf<Pair<Char, Int>, MutableSet<Word>>(); private set
     val size get() = words.size
     override fun iterator() = words.iterator()
 
@@ -28,16 +28,16 @@ class Vocabulary(val length: Int) : Iterable<Word> {
         also {
             words = wordList.filter{it.length==length || length==0}
                 .map{Word(it)}
-                .toSet()
-            justWords = words.map{ it.text }.toSet()
+                .toMutableSet()
+            justWords = words.map{ it.text }.toMutableSet()
             maxLength = if (length>0) length
                         else justWords.maxOf{ it.length }
             LetterSet.all.forEach{ char ->
-                index[char to -2] = words.filter{ char !in it.chars }.toSet()
-                index[char to -1] = words.filter{ char in it.chars }.toSet()
+                index[char to -2] = words.filter{ char !in it.chars }.toMutableSet()
+                index[char to -1] = words.filter{ char in it.chars }.toMutableSet()
                 (0..maxLength-1).forEach{ idx ->
                     index[char to idx] = words
-                        .filter{ it.length >= idx && it.text.get(idx)==char}.toSet()
+                        .filter{ it.length >= idx && it.text.get(idx)==char}.toMutableSet()
                 }
             }
         }
@@ -45,6 +45,23 @@ class Vocabulary(val length: Int) : Iterable<Word> {
     fun loadFile(fileName: String) =
         also {
             load(java.io.File(fileName).readLines())
+        }
+
+    fun addWord(word: String) =
+        also {
+            val w = Word(word)
+            words.add(w)
+            justWords.add(word)
+            LetterSet.all.forEach{ char ->
+                if (char in w.chars) {
+                    index[char to -1]!!.add(w)
+                    word.forEachIndexed{ pos, ch ->
+                        index[ch to pos]!!.add(w)
+                    }
+                } else {
+                    index[char to -2]!!.add(w)
+                }
+            }
         }
 
     /*

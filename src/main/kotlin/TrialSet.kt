@@ -12,7 +12,7 @@ import kotlinx.coroutines.GlobalScope
 class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
     val trials = if (text.isNullOrEmpty()) mutableListOf() else parse(text)
     val size get() = trials.size
-    var matches = vocab.words; private set
+    var matches = vocab.words as Set<Word>; private set
 
     /*
      * iterator - return each of the Trial objects in sequence
@@ -48,14 +48,14 @@ class TrialSet(val vocab: Vocabulary, text: String?=null) : Iterable<Trial> {
     fun match() =
         let {
             val first: Set<Word>? = null
-            matches = trials.fold(first)
-                { prev, next ->
-                    let {
-                        val thisFind = next.find(vocab).toSet()
-                        prev?.intersect(thisFind) ?: thisFind
-                    }
-            } ?: setOf()
-            matches
+            (trials.fold(first)
+            { prev, next ->
+                let {
+                    val thisFind = next.find(vocab).toSet()
+                    prev?.intersect(thisFind) ?: thisFind
+                }
+            } ?: setOf())
+            .also { matches = it }
         }
 
     /*

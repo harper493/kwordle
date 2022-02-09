@@ -18,7 +18,8 @@ class Kwordle(var vocab: Vocabulary, val cmdArgs: Args) {
         Command("reveal", "show the current word (cheat!)", ::doReveal),
         Command("set", "set a known word", ::doSet),
         Command("try", "try a word against the current word", ::doTry),
-        Command("undo", "undo last tried word", ::doUndo)
+        Command("undo", "undo last tried word", ::doUndo),
+        Command("words", "add word(s) to dictionary", ::doWords)
     )
 
     init {
@@ -49,6 +50,12 @@ class Kwordle(var vocab: Vocabulary, val cmdArgs: Args) {
             CommandList.error("Too many arguments)")
         }
         return args[0]
+    }
+
+    private fun someArgs(args: List<String>) {
+        if (args.isEmpty()) {
+            CommandList.error("One or more arguments required for this command")
+        }
     }
 
     private fun newWord(text: String? = null) {
@@ -128,6 +135,11 @@ class Kwordle(var vocab: Vocabulary, val cmdArgs: Args) {
 
     fun doSet(args: List<String>) {
         newWord(oneArg(args))
+    }
+
+    fun doWords(args: List<String>) {
+        someArgs(args)
+        args.forEach{ vocab.addWord(it) }
     }
 
     fun doUndo(args: List<String>) {
